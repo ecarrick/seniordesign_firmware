@@ -18,7 +18,7 @@ function read_reg(dev_addr, reg_addr)
     return c
 end
 
--- get content of register 0xAA of device 0x77
+-- get content of register 0x6B of device 0x15
 tempL = read_reg(0x6B, 0x15)
 tempH = read_reg(0x6B, 0x16)
 print(string.byte(tempL))
