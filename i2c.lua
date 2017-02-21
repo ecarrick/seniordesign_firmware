@@ -7,9 +7,9 @@ i2c.setup(id, sda, scl, i2c.SLOW)
 
 -- user defined function: read from reg_addr content of dev_addr
 function read_reg(dev_addr, reg_addr)
-    i2c.start(id)
-    i2c.address(id, dev_addr, i2c.TRANSMITTER)
-    i2c.write(id, reg_addr)
+    i2c.start(id)  -- initialize i2c
+    i2c.address(id, dev_addr, i2c.TRANSMITTER) -- set device to xmit
+    i2c.write(id, reg_addr) -- need to send register value that you want on the bus, after that you can read data
     i2c.stop(id)
     i2c.start(id)
     i2c.address(id, dev_addr, i2c.RECEIVER)
