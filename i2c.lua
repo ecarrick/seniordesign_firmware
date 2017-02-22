@@ -63,8 +63,8 @@ end
 -- read x acceleration
 function read_x_accel()
     -- read lower and upper byte of accel data in x
-    x_low = read_reg(0x6B, OUT_X_L_XL)
-    x_high = read_reg(0x6B, OUT_X_H_XL)
+    x_low = read_reg_byte(0x6B, OUT_X_L_XL)
+    x_high = read_reg_byte(0x6B, OUT_X_H_XL)
     -- shift upper byte of accel data to the left and then or it with lower byte
     x_high = bit.lshift(x_high, 8)
     x_accel = bit.bor(x_high, x_low)
@@ -75,8 +75,8 @@ end
 -- read y acceleration
 function read_y_accel()
     -- read lower and upper byte of accel data in y
-    y_low = read_reg(0x6B, OUT_Y_L_XL)
-    y_high = read_reg(0x6B, OUT_Y_H_XL)
+    y_low = read_reg_byte(0x6B, OUT_Y_L_XL)
+    y_high = read_reg_byte(0x6B, OUT_Y_H_XL)
     -- shift upper byte of accel data to the left and then or it with lower byte
     y_high = bit.lshift(y_high, 8)
     y_accel = bit.bor(y_high, y_low)
@@ -87,8 +87,8 @@ end
 -- read z acceleration
 function read_z_accel()
     -- read lower and upper byte of accel data in z
-    z_low = read_reg(0x6B, OUT_Z_L_XL)
-    z_high = read_reg(0x6B, OUT_Z_H_XL)
+    z_low = read_reg_byte(0x6B, OUT_Z_L_XL)
+    z_high = read_reg_byte(0x6B, OUT_Z_H_XL)
     -- shift upper byte of accel data to the left and then or it with lower byte
     z_high = bit.lshift(z_high, 8)
     z_accel = bit.bor(z_high, z_low)
