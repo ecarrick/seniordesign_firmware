@@ -1,8 +1,6 @@
 id  = 0
 sda = 2
 scl = 1
-aRes = 0.000061
-gRes = 0.00875
 OUT_X_L_XL = 0x28 -- reg address for lower 8-bits of accel in x 
 OUT_X_H_XL = 0x29 -- reg address for upper 8-bits of accel in x
 OUT_Y_L_XL = 0x2A -- accel, lower 8-bits in y
@@ -99,7 +97,6 @@ function read_x_accel()
     -- shift upper byte of accel data to the left and then or it with lower byte
     x_high = bit.lshift(x_high, 8)
     x_accel = bit.bor(x_high, x_low)
-    x_accel = x_accel * aRes
     return x_accel
 end
 
@@ -110,7 +107,6 @@ function read_x_gyro()
     print(x_high)
     x_high = bit.lshift(x_high, 8)
     x_gyro = bit.bor(x_high, x_low)
-    x_gyro = x_gyro * gRes
     return x_gyro
 end
 
@@ -122,7 +118,6 @@ function read_y_accel()
     -- shift upper byte of accel data to the left and then or it with lower byte
     y_high = bit.lshift(string.byte(y_high), 8)
     y_accel = bit.bor(y_high, y_low)
-    y_accel = y_accel * aRes
     return y_accel
 end
 
@@ -133,7 +128,6 @@ function read_y_gyro()
     print(y_high)
     y_high = bit.lshift(y_high, 8)
     y_gyro = bit.bor(y_high, y_low)
-    y_gyro = y_gyro * gRes
     return y_gyro
 end
 
@@ -145,7 +139,6 @@ function read_z_accel()
     -- shift upper byte of accel data to the left and then or it with lower byte
     z_high = bit.lshift(z_high, 8)
     z_accel = bit.bor(z_high, z_low)
-    z_accel = z_accel * aRes
     return z_accel
 end
 
@@ -157,7 +150,6 @@ function read_z_gyro()
     print(z_high)
     z_high = bit.lshift(z_high, 8)
     z_gyro = bit.bor(z_high, z_low)
-    z_gyro = z_gyro * gRes
     return z_gyro
 end
 
