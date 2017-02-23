@@ -71,7 +71,7 @@ function read_x_accel()
     -- shift upper byte of accel data to the left and then or it with lower byte
     x_high = bit.lshift(x_high, 8)
     x_accel = bit.bor(x_high, x_low)
-    
+    x_accel = x_accel * 0.000061
     return x_accel
 end
 
@@ -83,7 +83,7 @@ function read_y_accel()
     -- shift upper byte of accel data to the left and then or it with lower byte
     y_high = bit.lshift(string.byte(y_high), 8)
     y_accel = bit.bor(y_high, y_low)
-    
+    y_accel = y_accel * 0.000061
     return y_accel
 end
 
@@ -95,7 +95,7 @@ function read_z_accel()
     -- shift upper byte of accel data to the left and then or it with lower byte
     z_high = bit.lshift(z_high, 8)
     z_accel = bit.bor(z_high, z_low)
-    
+    z_accel = z_accel * 0.000061
     return z_accel
 end
 
