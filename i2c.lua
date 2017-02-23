@@ -30,11 +30,11 @@ end
 -- write value to specified address
 function write_reg_byte(dev_addr, reg_addr, write_value)
     i2c.start(id)
+    -- setup the write for device
     i2c.address(id, dev_addr, i2c.TRANSMITTER)
+    -- write onto bus what register to be written
     i2c.write(id, reg_addr)
-    i2c.stop(id)
-    i2c.start(id)
-    i2c.address(id, dev_addr, i2c.RECEIVER)
+    -- write the value onto bus for specified register
     c = i2c.write(id, write_value)
     i2c.stop(id)
 end
@@ -47,6 +47,7 @@ function init_accel()
     register_write_value = bit.bor(register_write_value, bit.lshift(1, 5))
     register_write_value = bit.bor(register_write_value, bit.lshift(1, 4))
     register_write_value = bit.bor(register_write_value, bit.lshift(1, 3))
+    
     write_reg_byte(0x6B, CTRL_REG5_XL, register_write_value)
 
     -- set ctrl_reg6_xl
@@ -56,15 +57,17 @@ function init_accel()
     
     -- set ctrl_reg7_xl
     register_write_value = 0
-    write_reg_byte(0x6B, CTRL_REG6_XL, register_write_value)
+    write_reg_byte(0x6B, CTRL_REG7_XL, register_write_value)
     
 end
 
 -- read x acceleration
 function read_x_accel()
     -- read lower and upper byte of accel data in x
-    x_low = read_reg_byte(0x6B, OUT_X_L_XL)
-    x_high = read_reg_byte(0x6B, OUT_X_H_XL)
+    x_low = string.byte(read_reg_byte(0x6B, OUT_X_L_XL))
+    print(x_low)
+    x_high = string.byte(read_reg_byte(0x6B, OUT_X_H_XL))
+    print(x_high)
     -- shift upper byte of accel data to the left and then or it with lower byte
     x_high = bit.lshift(x_high, 8)
     x_accel = bit.bor(x_high, x_low)
@@ -75,10 +78,10 @@ end
 -- read y acceleration
 function read_y_accel()
     -- read lower and upper byte of accel data in y
-    y_low = read_reg_byte(0x6B, OUT_Y_L_XL)
-    y_high = read_reg_byte(0x6B, OUT_Y_H_XL)
+    y_low = string.byte(read_reg_byte(0x6B, OUT_Y_L_XL))
+    y_high = string.byte(read_reg_byte(0x6B, OUT_Y_H_XL))
     -- shift upper byte of accel data to the left and then or it with lower byte
-    y_high = bit.lshift(y_high, 8)
+    y_high = bit.lshift(string.byte(y_high), 8)
     y_accel = bit.bor(y_high, y_low)
     
     return y_accel
@@ -87,8 +90,8 @@ end
 -- read z acceleration
 function read_z_accel()
     -- read lower and upper byte of accel data in z
-    z_low = read_reg_byte(0x6B, OUT_Z_L_XL)
-    z_high = read_reg_byte(0x6B, OUT_Z_H_XL)
+    z_low = string.byte(read_reg_byte(0x6B, OUT_Z_L_XL))
+    z_high = string.byte(read_reg_byte(0x6B, OUT_Z_H_XL))
     -- shift upper byte of accel data to the left and then or it with lower byte
     z_high = bit.lshift(z_high, 8)
     z_accel = bit.bor(z_high, z_low)
