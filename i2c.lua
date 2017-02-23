@@ -62,6 +62,7 @@ function init_accel()
     -- set ctrl_reg6_xl
     register_write_value = 0
     register_write_value = bit.lshift(bit.band(6, 0x07), 5)
+    register_write_value = bit.bor(register_write_value, bit.lshift(0x3, 3))
     write_reg_byte(0x6B, CTRL_REG6_XL, register_write_value)
     
     -- set ctrl_reg7_xl
@@ -80,7 +81,7 @@ function init_gyro()
     -- set ctrl_reg2_g
     register_write_value = 0
     write_reg_byte(0x6B, CTRL_REG2_G, register_write_value)
-    
+
     -- set ctrl_reg3_g
     register_write_value = 0
     write_reg_byte(0x6B, CTRL_REG3_G, register_write_value)
