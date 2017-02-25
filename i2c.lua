@@ -47,7 +47,6 @@ function write_reg_byte(dev_addr, reg_addr, write_value)
     c = i2c.write(id, write_value)
     i2c.stop(id)
 end
-  
 
 -- set up accelerometer registers
 function init_accel()
@@ -92,20 +91,23 @@ end
 function read_x_accel()
     -- read lower and upper byte of accel data in x
     x_low = string.byte(read_reg_byte(0x6B, OUT_X_L_XL))
-    print(x_low)
     x_high = string.byte(read_reg_byte(0x6B, OUT_X_H_XL))
-    print(x_high)
     -- shift upper byte of accel data to the left and then or it with lower byte
     x_high = bit.lshift(x_high, 8)
     x_accel = bit.bor(x_high, x_low)
+    
+    -- convert from unsigned to signed
+    if (x_accel > 2^15) then
+        x_accel = x_accel - 2^16
+    end
+    print(x_accel)
+    
     return x_accel
 end
 
 function read_x_gyro()
     x_low = string.byte(read_reg_byte(0x6B, OUT_X_L_G))
-    print(x_low)
     x_high = string.byte(read_reg_byte(0x6B, OUT_X_H_G))
-    print(x_high)
     x_high = bit.lshift(x_high, 8)
     x_gyro = bit.bor(x_high, x_low)
     return x_gyro
@@ -117,16 +119,20 @@ function read_y_accel()
     y_low = string.byte(read_reg_byte(0x6B, OUT_Y_L_XL))
     y_high = string.byte(read_reg_byte(0x6B, OUT_Y_H_XL))
     -- shift upper byte of accel data to the left and then or it with lower byte
-    y_high = bit.lshift(string.byte(y_high), 8)
+    y_high = bit.lshift(y_high, 8)
     y_accel = bit.bor(y_high, y_low)
+    
+    -- convert from unsigned to signed
+    if (y_accel > 2^15) then
+        y_accel = y_accel - 2^16
+    end
+    
     return y_accel
 end
 
 function read_y_gyro()
     y_low = string.byte(read_reg_byte(0x6B, OUT_Y_L_G))
-    print(y_low)
     y_high = string.byte(read_reg_byte(0x6B, OUT_Y_H_G))
-    print(y_high)
     y_high = bit.lshift(y_high, 8)
     y_gyro = bit.bor(y_high, y_low)
     return y_gyro
@@ -140,6 +146,12 @@ function read_z_accel()
     -- shift upper byte of accel data to the left and then or it with lower byte
     z_high = bit.lshift(z_high, 8)
     z_accel = bit.bor(z_high, z_low)
+    
+    -- convert from unsigned to signed
+    if (z_accel > 2^15) then
+        z_accel = z_accel - 2^16
+    end
+    
     return z_accel
 end
 
