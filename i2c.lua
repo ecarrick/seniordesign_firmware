@@ -52,10 +52,7 @@ end
 function init_accel()
     -- set ctrl_reg5_xl
     register_write_value = 0
-    register_write_value = bit.bor(register_write_value, bit.lshift(1, 5))
-    register_write_value = bit.bor(register_write_value, bit.lshift(1, 4))
-    register_write_value = bit.bor(register_write_value, bit.lshift(1, 3))
-    
+    register_write_value = bit.bor(register_write_value, bit.lshift(0x7, 3))
     write_reg_byte(0x6B, CTRL_REG5_XL, register_write_value)
 
     -- set ctrl_reg6_xl
