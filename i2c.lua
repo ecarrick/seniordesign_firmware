@@ -106,7 +106,6 @@ function _read_imu_value(iic_address,lo_register, hi_register)
     
 end
 
--- read x acceleration
 function read_x_accel()
     return _read_imu_value(0x6B, OUT_X_L_XL, OUT_X_H_XL)
 end
@@ -115,7 +114,6 @@ function read_x_gyro()
     return _read_imu_value(0x6B, OUT_X_L_G, OUT_X_H_G)
 end
 
--- read y acceleration
 function read_y_accel()
     return _read_imu_value(0x6B, OUT_Y_L_XL, OUT_Y_H_XL)
 end
@@ -124,17 +122,14 @@ function read_y_gyro()
     return _read_imu_value(0x6B, OUT_Y_L_G, OUT_Y_H_G)
 end
 
--- read z acceleration
 function read_z_accel()
     return _read_imu_value(0x6B, OUT_Z_L_XL, OUT_Z_H_XL)
 end
 
--- read g gyro
 function read_z_gyro()
     return _read_imu_value(0x6B, OUT_Z_L_G, OUT_Z_H_G)
 end
 
--- get content of register 0x6B of device 0x15
 init_accel()
 temp_z_accel = read_z_accel()
 print(temp_z_accel)
