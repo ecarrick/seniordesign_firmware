@@ -87,89 +87,57 @@ function init_gyro()
     
 end
 
+-- generic function to read either a gyro or accelerometer value from registers
+function _read_imu_value(iic_address,lo_register, hi_register)
+
+    lower_byte = string.byte(read_reg_byte(iic_address, lo_register))
+    upper_byte = string.byte(read_reg_byte(iic_address, hi_register))
+
+    -- shift upper byte over and add lower byte
+    upper_byte = bit.lshift(upper_byte, 8)
+    imu_value = bit.bor(upper_byte, lower_byte)
+
+    -- convert unsigned to signed
+    if (imu_value > 2^15) then
+        imu_value = imu_value - 2^16
+    end
+
+    return imu_value
+    
+end
+
 -- read x acceleration
 function read_x_accel()
-    -- read lower and upper byte of accel data in x
-    x_low = string.byte(read_reg_byte(0x6B, OUT_X_L_XL))
-    x_high = string.byte(read_reg_byte(0x6B, OUT_X_H_XL))
-    -- shift upper byte of accel data to the left and then or it with lower byte
-    x_high = bit.lshift(x_high, 8)
-    x_accel = bit.bor(x_high, x_low)
-    
-    -- convert from unsigned to signed
-    if (x_accel > 2^15) then
-        x_accel = x_accel - 2^16
-    end
-    print(x_accel)
-    
-    return x_accel
+    return _read_imu_value(0x6B, OUT_X_L_XL, OUT_X_H_XL)
 end
 
 function read_x_gyro()
-    x_low = string.byte(read_reg_byte(0x6B, OUT_X_L_G))
-    x_high = string.byte(read_reg_byte(0x6B, OUT_X_H_G))
-    x_high = bit.lshift(x_high, 8)
-    x_gyro = bit.bor(x_high, x_low)
-    return x_gyro
+    return _read_imu_value(0x6B, OUT_X_L_G, OUT_X_H_G)
 end
 
 -- read y acceleration
 function read_y_accel()
-    -- read lower and upper byte of accel data in y
-    y_low = string.byte(read_reg_byte(0x6B, OUT_Y_L_XL))
-    y_high = string.byte(read_reg_byte(0x6B, OUT_Y_H_XL))
-    -- shift upper byte of accel data to the left and then or it with lower byte
-    y_high = bit.lshift(y_high, 8)
-    y_accel = bit.bor(y_high, y_low)
-    
-    -- convert from unsigned to signed
-    if (y_accel > 2^15) then
-        y_accel = y_accel - 2^16
-    end
-    
-    return y_accel
+    return _read_imu_value(0x6B, OUT_Y_L_XL, OUT_Y_H_XL)
 end
 
 function read_y_gyro()
-    y_low = string.byte(read_reg_byte(0x6B, OUT_Y_L_G))
-    y_high = string.byte(read_reg_byte(0x6B, OUT_Y_H_G))
-    y_high = bit.lshift(y_high, 8)
-    y_gyro = bit.bor(y_high, y_low)
-    return y_gyro
+    return _read_imu_value(0x6B, OUT_Y_L_G, OUT_Y_H_G)
 end
 
 -- read z acceleration
 function read_z_accel()
-    -- read lower and upper byte of accel data in z
-    z_low = string.byte(read_reg_byte(0x6B, OUT_Z_L_XL))
-    z_high = string.byte(read_reg_byte(0x6B, OUT_Z_H_XL))
-    -- shift upper byte of accel data to the left and then or it with lower byte
-    z_high = bit.lshift(z_high, 8)
-    z_accel = bit.bor(z_high, z_low)
-    
-    -- convert from unsigned to signed
-    if (z_accel > 2^15) then
-        z_accel = z_accel - 2^16
-    end
-    
-    return z_accel
+    return _read_imu_value(0x6B, OUT_Z_L_XL, OUT_Z_H_XL)
 end
 
 -- read g gyro
 function read_z_gyro()
-    z_low = string.byte(read_reg_byte(0x6B, OUT_Z_L_G))
-    print(z_low)
-    z_high = string.byte(read_reg_byte(0x6B, OUT_Z_H_G))
-    print(z_high)
-    z_high = bit.lshift(z_high, 8)
-    z_gyro = bit.bor(z_high, z_low)
-    return z_gyro
+    return _read_imu_value(0x6B, OUT_Z_L_G, OUT_Z_H_G)
 end
 
 -- get content of register 0x6B of device 0x15
 init_accel()
-temp_x = read_x_accel()
-print(string.byte(temp_x))
+temp_z_accel = read_z_accel()
+print(temp_z_accel)
 init_gyro()
-temp_x_gyro = read_x_gyro()
-print(string.byte(temp_x_gyro))
+temp_z_gyro = read_z_gyro()
+print(temp_z_gyro)
