@@ -1,7 +1,7 @@
+dofile("reg.lua")
 id  = 0
 sda = 2
 scl = 1
-dofile("reg.lua")
 
 -- initialize i2c, set pin1 as sda, set pin2 as scl
 i2c.setup(id, sda, scl, i2c.SLOW)
@@ -35,12 +35,15 @@ end
 function init_accel()
     -- set ctrl_reg5_xl
     register_write_value = 0
+    -- set Zen_XL, Yen_XL, Xen_XL bits to 1 enable each accelerometer
     register_write_value = bit.bor(register_write_value, bit.lshift(0x7, 3))
     write_reg_byte(0x6B, reg.CTRL_REG5_XL, register_write_value)
 
     -- set ctrl_reg6_xl
     register_write_value = 0
+    -- set ODR_XL bits to 110 to set output data rate to 952 Hz
     register_write_value = bit.lshift(bit.band(6, 0x07), 5)
+    -- set FS_XL bits to 11 to set accel scale to (+/-) 8g
     register_write_value = bit.bor(register_write_value, bit.lshift(0x3, 3))
     write_reg_byte(0x6B, reg.CTRL_REG6_XL, register_write_value)
     
@@ -54,7 +57,10 @@ end
 function init_gyro()
     -- set ctrl_reg1_g
     register_write_value = 0
+    -- set ODR_G bitsto 110 to set output data rate to 952 Hz
     register_write_value = bit.lshift(bit.band(6, 0x07), 5)
+    -- set FS_G bits to 01 to set gyro scale to (+/-) 500 dps
+    register_write_value = bit.bor(register_write_value, bit.lshift(0x1, 3))
     write_reg_byte(0x6B, reg.CTRL_REG1_G, register_write_value)
  
     -- set ctrl_reg2_g
