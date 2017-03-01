@@ -144,6 +144,7 @@ function record(calib_val)
         count+= 1
     end
     return y
+end
 
 init_accel()
 temp_z_accel = read_z_accel()
