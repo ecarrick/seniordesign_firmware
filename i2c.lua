@@ -116,6 +116,35 @@ function read_z_gyro()
     return _read_imu_value(0x6B, reg.OUT_Z_L_G, reg.OUT_Z_H_G)
 end
 
+-- read acc/gyro data through a low pass filter
+-- gain is a positive integer that weighs previous calculation more heavily than raw data
+function collect_filter(gain, prev)
+    x = {}
+    x[1] = read_x_accel()
+    x[2] = read_y_accel()
+    x[3] = read_z_accel()
+    x[4] = read_x_gyro()
+    x[5] = read_y_gyro()
+    x[6] = read_z_gyro()
+    y = x + gain*prev
+    return y
+end
+
+-- for gain of 3, output values will be scaled by 4 to retain accuracy with integer only proccessing
+-- should operate for ~10.5 seconds before timing out (*need pushbutton interrupt*)
+function record(calib_val)
+    gain = 3
+    count = 1
+    y = {}
+    y[1] = calib_val
+    while count <= 10000 do
+        y[count + 1] = collect_filter(gain, y[count])
+        tmr.wdclr()
+        tmr.delay(1050)
+        count+= 1
+    end
+    return y
+
 init_accel()
 temp_z_accel = read_z_accel()
 print(temp_z_accel)
