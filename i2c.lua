@@ -141,7 +141,7 @@ function record(calib_val, nsamp)
         y[count + 1] = collect_filter(gain, y[count])
         tmr.wdclr()
         tmr.delay(1050)
-        count+= 1
+        count = count + 1
     end
     return y
 end
@@ -150,7 +150,7 @@ end
 -- sensitivity is in LSBx4 due to integer only filtering
 function calibrate(sensitivity)
     clear = false
-    while !clear do
+    while not clear do
         x = {}
         x[1] = read_x_accel()
         x[2] = read_y_accel()
@@ -168,9 +168,5 @@ function calibrate(sensitivity)
 end    
     
 init_accel()
-temp_z_accel = read_z_accel()
-print(temp_z_accel)
 init_gyro()
-temp_z_gyro = read_z_gyro()
-print(temp_z_gyro)
 
