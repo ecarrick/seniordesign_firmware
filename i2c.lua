@@ -131,13 +131,13 @@ function collect_filter(gain, prev)
 end
 
 -- for gain of 3, output values will be scaled by 4 to retain accuracy with integer only proccessing
--- should operate for ~10.5 seconds before timing out (*need pushbutton interrupt*)
-function record(calib_val)
+-- 10000 samples should operate for ~10.5 seconds before timing out (*need pushbutton interrupt*)
+function record(calib_val, nsamp)
     gain = 3
     count = 1
     y = {}
     y[1] = calib_val
-    while count <= 10000 do
+    while count <= nsamp do
         y[count + 1] = collect_filter(gain, y[count])
         tmr.wdclr()
         tmr.delay(1050)
@@ -146,6 +146,27 @@ function record(calib_val)
     return y
 end
 
+-- potential implementation of a calibration to set initial orientation with variable sensitivity for testing
+-- sensitivity is in LSBx4 due to integer only filtering
+function calibrate(sensitivity)
+    clear = false
+    while !clear do
+        x = {}
+        x[1] = read_x_accel()
+        x[2] = read_y_accel()
+        x[3] = read_z_accel()
+        x[4] = read_x_gyro()
+        x[5] = read_y_gyro()
+        x[6] = read_z_gyro()
+        y = record(x, 5)
+        a = (y[5][1] > -sensitivity and y[5][1] < sensitivity)
+        b = (y[5][2] > -sensitivity and y[5][2] < sensitivity)
+        c = (y[5][3] > -16384 - sensitivity and y[5][3] < -16384 + sensitivity)
+        if a and b and c then clear = true end
+    end
+    return y[5]
+end    
+    
 init_accel()
 temp_z_accel = read_z_accel()
 print(temp_z_accel)
