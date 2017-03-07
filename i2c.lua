@@ -119,15 +119,13 @@ end
 -- read acc/gyro data through a low pass filter
 -- gain is a positive integer that weighs previous calculation more heavily than raw data
 function collect_filter(gain, prev)
-    x = {}
-    x[1] = read_x_accel()
-    x[2] = read_y_accel()
-    x[3] = read_z_accel()
-    x[4] = read_x_gyro()
-    x[5] = read_y_gyro()
-    x[6] = read_z_gyro()
-    y = x + gain*prev
-    y = y/(gain + 1)
+    y = {}
+    y[1] = (read_x_accel() + gain * prev[1])/(gain + 1)
+    y[2] = (read_y_accel() + gain * prev[2])/(gain + 1)
+    y[3] = (read_z_accel() + gain * prev[3])/(gain + 1)
+    y[4] = (read_x_gyro() + gain * prev[4])/(gain + 1)
+    y[5] = (read_y_gyro() + gain * prev[5])/(gain + 1)
+    y[6] = (read_z_gyro() + gain * prev[6])/(gain + 1)
     return y
 end
 
