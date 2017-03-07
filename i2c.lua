@@ -119,7 +119,7 @@ end
 -- read acc/gyro data through a low pass filter
 -- gain is a positive integer that weighs previous calculation more heavily than raw data
 function collect_filter(gain, prev)
-    y = {}
+    local y = {}
     y[1] = (read_x_accel() + gain * prev[1])/(gain + 1)
     y[2] = (read_y_accel() + gain * prev[2])/(gain + 1)
     y[3] = (read_z_accel() + gain * prev[3])/(gain + 1)
@@ -135,8 +135,7 @@ end
 function record(calib_val, nsamp)
     gain = 3
     count = 1
-    y = {}
-    y[1] = calib_val
+    local y = {[1] = calib_val}
     while count < nsamp do
         y[count + 1] = collect_filter(gain, y[count])
         tmr.wdclr()
@@ -150,8 +149,9 @@ end
 -- sensitivity is in LSB 
 function calibrate(sensitivity)
     clear = false
+    local y
     while not clear do
-        x = {}
+        local x = {}
         x[1] = read_x_accel()
         x[2] = read_y_accel()
         x[3] = read_z_accel()
@@ -161,7 +161,7 @@ function calibrate(sensitivity)
         y = record(x, 5)
         a = (y[5][1] > -sensitivity and y[5][1] < sensitivity)
         b = (y[5][2] > -sensitivity and y[5][2] < sensitivity)
-        c = (y[5][3] > -4096 - sensitivity and y[5][3] < -4096 + sensitivity)
+        c = (y[5][3] > 4096 - sensitivity and y[5][3] < 4096 + sensitivity)
         if a and b and c then clear = true end
     end
     return y[5]
@@ -169,4 +169,6 @@ end
     
 init_accel()
 init_gyro()
-
+-- calib = calibrate(300)
+-- IMU = record(calib, 100)
+-- print(IMU[50][1],IMU[50][3])
