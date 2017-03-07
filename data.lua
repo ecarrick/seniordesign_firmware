@@ -1,8 +1,10 @@
-dofile("wifi.lua")
-function firebase_put()
+dofile("i2c.lua")
 
-    json = cjson.encode(test)
-    http.put("https://shotanalytics-17fc3.firebaseio.com/test/data146.json",
+dofile("wifi.lua")
+function firebase_put(data)
+
+    json = cjson.encode(data)
+    http.put("https://shotanalytics-17fc3.firebaseio.com/test/data.json",
                 nil,
                 json,
                 function(code,data)
@@ -12,6 +14,13 @@ function firebase_put()
                   print(code, data)
     end
   end)
+end
+
+function start()
+    data = record(4000, 100)
+
+    json = cjson.encode(data)
+    print(json)
 end
 
 function setup()
@@ -25,9 +34,9 @@ function setup()
     print(wifi.sta.getip())
     
     
-    firebase_put()
+    start()
 
     
 end
 
---setup()
+start()
