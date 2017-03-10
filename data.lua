@@ -6,14 +6,14 @@ shot_num = 0
 function firebase_put(data)
 
     -- set this to where you want to store each shot
-    json_name = "My_Test"
+    json_name = "testdata"
     
-    firebase_str = "https://shotanalytics-17fc3.firebaseio.com/" .. json_name .. "/shot" .. shot_num .. ".json"
+    firebase_str = "https://shotanalytics-17fc3.firebaseio.com/" .. json_name .. "/shot" .. shot_num
+    print(firebase_str)
     
-    json = cjson.encode(data)
-    http.put(firebase_str,
+    http.post(firebase_str,
                 nil,
-                json,
+                cjson.encode(data),
                 function(code,data)
                 if (code < 0) then
                   print("HTTP request failed")
@@ -26,13 +26,16 @@ end
 
 function start()
     calib = calibrate(500)
-    
-    -- having trouble recording/sending more than about 20 samples
-    data = record(calib, 20)
+    counter = 0
+    while counter < 1 do
 
-    json = cjson.encode(data)
-    print(json)
-    
+        print(counter)
+        -- having trouble recording/sending more than about 20 samples
+        local data = record(calib, 20)
+        firebase_put(data)
+        tmr.delay(5000000)
+        counter = counter+1
+    end
     --uncomment next line to send recording to firebase
     --firebase_put(data)
 end
@@ -53,4 +56,4 @@ function setup()
     
 end
 
-start()
+setup()

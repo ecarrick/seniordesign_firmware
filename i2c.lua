@@ -138,6 +138,7 @@ function record(calib_val, nsamp)
     local y = {[1] = calib_val}
     while count < nsamp do
         y[count + 1] = collect_filter(gain, y[count])
+        print(node.heap())
         tmr.wdclr()
         tmr.delay(1050)
         count = count + 1
