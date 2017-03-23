@@ -146,6 +146,29 @@ function record(calib_val, nsamp)
     return y
 end
 
+function record_to_file(nsamp, file_name)
+    gain = 3
+    count = 1
+    if file.open(file_name, "w") then
+        print("start\n")
+        while count < nsamp do
+            local temp = {}
+            temp[1] = read_x_accel()
+            temp[2] = read_y_accel()
+            temp[3] = read_z_accel()
+            temp[4] = read_x_gyro()
+            temp[5] = read_y_gyro()
+            temp[6] = read_z_gyro()
+            tmr.wdclr()
+            --tmr.delay(1050)
+            count = count + 1
+            line = "" .. temp[1] .. "," .. temp[2] .. "," .. temp[3] .. "," .. temp[4] .. "," .. temp[5] .. "," .. temp[6] .. ""
+            file.writeline(line)
+        end
+    end
+    file.close()
+end
+
 -- potential implementation of a calibration to set initial orientation with variable sensitivity for testing
 -- sensitivity is in LSB 
 function calibrate(sensitivity)
