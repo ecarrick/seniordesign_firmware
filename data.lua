@@ -40,6 +40,25 @@ function start()
     --firebase_put(data)
 end
 
+function start_and_record_to_file()
+    
+    file_name = "test.txt"
+    -- first parameter is number of values to record
+    record_to_file(100, file_name)
+    file.open(file_name)
+    
+    while true do
+        line = file.readline()
+        if (line == nil) then break
+        end
+        print(line)
+        tmr.wdclr()
+    end
+    file.close()
+
+    --firebase_put(data)
+end
+
 function setup()
     wifi.setmode(wifi.STATION)
     wifi.sta.config(wifi_ssid, wifi_password)
