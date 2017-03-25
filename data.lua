@@ -8,7 +8,7 @@ function firebase_put(data)
     -- set this to where you want to store each shot
     json_name = "testdata"
     
-    firebase_str = "https://shotanalytics-17fc3.firebaseio.com/" .. json_name .. "/shot" .. shot_num
+    firebase_str = "https://shotanalytics-17fc3.firebaseio.com/" .. json_name .. "/shot" .. shot_num .. ".json"
     print(firebase_str)
     
     http.post(firebase_str,
@@ -44,19 +44,33 @@ function start_and_record_to_file()
     
     file_name = "test.txt"
     -- first parameter is number of values to record
-    record_to_file(100, file_name)
+    record_to_file(5, file_name)
     file.open(file_name)
-    
+
+    firebase_put_count = 1
+    firebase_table = {}
     while true do
         line = file.readline()
         if (line == nil) then break
         end
-        print(line)
+        value_count = 1
+        value_table = {}
+        -- parse values from text file, this regex extracts each integer
+        -- "-?" finds optional - sign in case integer is negative, "d+" fids integer and stops at next non integer char.,
+        -- in this case a comma
+        for val in string.gmatch(line, "-?%d+") do
+            value_table[value_count] = val
+            value_count = value_count + 1
+            print(val)
+        end
+        firebase_table[firebase_put_count] = value_table
+        firebase_put_count = firebase_put_count + 1
         tmr.wdclr()
     end
+    firebase_put(firebase_table)
     file.close()
 
-    --firebase_put(data)
+   
 end
 
 function setup()
