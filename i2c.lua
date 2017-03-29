@@ -6,6 +6,16 @@ scl = 1
 -- initialize i2c, set pin1 as sda, set pin2 as scl
 i2c.setup(id, sda, scl, i2c.SLOW)
 
+function write_to_mux(val)
+    i2c.start(id)
+    -- setup the write for device
+    i2c.address(id, 0xE0, i2c.TRANSMITTER)
+    -- write onto bus what register to be written
+    i2c.write(id, val)
+    -- write the value onto bus for specified register
+    i2c.stop(id)
+end
+
 -- user defined function: read single byte from reg_addr content of dev_addr
 function read_reg_byte(dev_addr, reg_addr)
     i2c.start(id)  -- initialize i2c
