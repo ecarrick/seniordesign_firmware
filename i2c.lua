@@ -16,6 +16,61 @@ function write_to_mux(val)
     i2c.stop(id)
 end
 
+function read_mux_config()
+    i2c.start(id)
+    i2c.address(id, 0xE1, i2c.TRANSMITTER)
+    c = i2c.read(id, 1)
+    i2c.stop(id)
+    return c
+end
+
+function read_x_accel()
+    return _read_imu_value(0x6B, reg.OUT_X_L_XL, reg.OUT_X_H_XL)
+end
+
+function read_x_gyro()
+    return _read_imu_value(0x6B, reg.OUT_X_L_G, reg.OUT_X_H_G)
+end
+
+function read_y_accel()
+    return _read_imu_value(0x6B, reg.OUT_Y_L_XL, reg.OUT_Y_H_XL)
+end
+
+function read_y_gyro()
+    return _read_imu_value(0x6B, reg.OUT_Y_L_G, reg.OUT_Y_H_G)
+end
+
+function read_z_accel()
+    return _read_imu_value(0x6B, reg.OUT_Z_L_XL, reg.OUT_Z_H_XL)
+end
+
+function read_z_gyro()
+    return _read_imu_value(0x6B, reg.OUT_Z_L_G, reg.OUT_Z_H_G)
+
+function read_imu_data(dev_addr)
+    data = {}
+    i2c.start(id)
+    i2c.address(id, dev_addr, i2c.TRANSMITTER)
+    i2c.write(id, reg.OUT_X_L_G)
+    i2c.stop(id)
+    i2c.start(id)
+    i2c.address(id, dev_addr, i2c.RECEIVER)
+    data.X_L_G = i2c.read(id, 1)
+    data.X_H_G = i2c.read(id, 1)
+    data.Y_L_G = i2c.read(id, 1)
+    data.Y_H_G = i2c.read(id, 1)
+    data.Z_L_G = i2c.read(id, 1)
+    data.Z_H_G = i2c.read(id, 1)
+    data.X_L_X = i2c.read(id, 1)
+    data.X_H_X = i2c.read(id, 1)
+    data.Y_L_X = i2c.read(id, 1)
+    data.Y_H_X = i2c.read(id, 1)
+    data.Z_L_X = i2c.read(id, 1)
+    data.Z_H_X = i2c.read(id, 1)
+    i2c.stop(id)
+    return data
+end  
+
 -- user defined function: read single byte from reg_addr content of dev_addr
 function read_reg_byte(dev_addr, reg_addr)
     i2c.start(id)  -- initialize i2c
