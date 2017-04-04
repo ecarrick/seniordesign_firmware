@@ -46,8 +46,9 @@ end
 
 function read_z_gyro()
     return _read_imu_value(0x6B, reg.OUT_Z_L_G, reg.OUT_Z_H_G)
+end
 
-out = {0,0,0,0,0,0}
+out = {0, 0,  0, 0, 0, 0}
 function read_imu_data(dev_addr)
     local data
     i2c.start(id)
@@ -290,10 +291,13 @@ function record_to_file(nsamp, file_name)
             temp4 = read_imu_data(0x6B)
             tmr.wdclr()
             count = count + 1
-            line = "" .. temp1[1] .. "," .. temp1[2] .. "," .. temp1[3] .. "," .. temp1[4] .. "," .. temp1[5] .. "," .. temp1[6] .. ","
-                      .. temp2[1] .. "," .. temp2[2] .. "," .. temp2[3] .. "," .. temp2[4] .. "," .. temp2[5] .. "," .. temp2[6] .. ","
-                      .. temp3[1] .. "," .. temp3[2] .. "," .. temp3[3] .. "," .. temp3[4] .. "," .. temp3[5] .. "," .. temp3[6] .. ","
-                      .. temp4[1] .. "," .. temp4[2] .. "," .. temp4[3] .. "," .. temp4[4] .. "," .. temp4[5] .. "," .. temp4[6] .. ""
+            line = cjson.encode(temp1)
+            print(temp1)
+            print(line)
+            -- line = "" .. temp1[1] .. "," .. temp1[2] .. "," .. temp1[3] .. "," .. temp1[4] .. "," .. temp1[5] .. "," .. temp1[6] .. ","
+                      -- .. temp2[1] .. "," .. temp2[2] .. "," .. temp2[3] .. "," .. temp2[4] .. "," .. temp2[5] .. "," .. temp2[6] .. ","
+                      -- .. temp3[1] .. "," .. temp3[2] .. "," .. temp3[3] .. "," .. temp3[4] .. "," .. temp3[5] .. "," .. temp3[6] .. ","
+                      -- .. temp4[1] .. "," .. temp4[2] .. "," .. temp4[3] .. "," .. temp4[4] .. "," .. temp4[5] .. "," .. temp4[6] .. ""
             file.writeline(line)
         end
     end
