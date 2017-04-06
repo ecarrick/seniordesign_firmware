@@ -3,6 +3,8 @@ id  = 0
 sda = 2
 scl = 1
 
+node.setcpufreq(node.CPU160MHZ)
+
 -- initialize i2c, set pin1 as sda, set pin2 as scl
 i2c.setup(id, sda, scl, i2c.SLOW)
 
@@ -18,7 +20,11 @@ end
 
 function read_mux_config()
     i2c.start(id)
-    i2c.address(id, 0x71, i2c.TRANSMITTER)
+    i2c.address(id, 0x70, i2c.TRANSMITTER)
+    i2c.write(id, 0x71)
+    i2c.stop(id)
+    i2c.start(id)
+    i2c.address(id, 0x70, i2c.RECEIVER)
     c = i2c.read(id, 1)
     i2c.stop(id)
     return c
@@ -48,9 +54,9 @@ function read_z_gyro()
     return _read_imu_value(0x6B, reg.OUT_Z_L_G, reg.OUT_Z_H_G)
 end
 
-out = {0, 0,  0, 0, 0, 0}
 function read_imu_data(dev_addr)
     local data
+    local out = {0, 0,  0, 0, 0, 0}
     i2c.start(id)
     i2c.address(id, dev_addr, i2c.TRANSMITTER)
     i2c.write(id, reg.OUT_X_L_G)
