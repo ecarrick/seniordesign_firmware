@@ -56,7 +56,7 @@ end
 
 function read_imu_data(dev_addr)
     local data
-    local out = {0, 0,  0, 0, 0, 0}
+   -- local out = {0, 0,  0, 0, 0, 0}
     i2c.start(id)
     i2c.address(id, dev_addr, i2c.TRANSMITTER)
     i2c.write(id, reg.OUT_X_L_G)
@@ -65,81 +65,83 @@ function read_imu_data(dev_addr)
     i2c.address(id, dev_addr, i2c.RECEIVER)
     data = i2c.read(id, 12)
     i2c.stop(id)
+    
+    return data
     --print(data)
     
-    lower_byte = string.byte(data, 1)
-    upper_byte = string.byte(data, 2)
+    -- lower_byte = string.byte(data, 1)
+    -- upper_byte = string.byte(data, 2)
 
-    -- shift upper byte over and add lower byte
-    upper_byte = bit.lshift(upper_byte, 8)
-    out[1] = bit.bor(upper_byte, lower_byte)
+    -- -- shift upper byte over and add lower byte
+    -- upper_byte = bit.lshift(upper_byte, 8)
+    -- out[1] = bit.bor(upper_byte, lower_byte)
 
-    -- convert unsigned to signed
-    if (out[1] > 2^15) then
-        out[1] = out[1] - 2^16
-    end
+    -- -- convert unsigned to signed
+    -- if (out[1] > 2^15) then
+        -- out[1] = out[1] - 2^16
+    -- end
 
-    lower_byte = string.byte(data, 3)
-    upper_byte = string.byte(data, 4)
+    -- lower_byte = string.byte(data, 3)
+    -- upper_byte = string.byte(data, 4)
 
-    -- shift upper byte over and add lower byte
-    upper_byte = bit.lshift(upper_byte, 8)
-    out[2] = bit.bor(upper_byte, lower_byte)
+    -- -- shift upper byte over and add lower byte
+    -- upper_byte = bit.lshift(upper_byte, 8)
+    -- out[2] = bit.bor(upper_byte, lower_byte)
 
-    -- convert unsigned to signed
-    if (out[2] > 2^15) then
-        out[2] = out[2] - 2^16
-    end
+    -- -- convert unsigned to signed
+    -- if (out[2] > 2^15) then
+        -- out[2] = out[2] - 2^16
+    -- end
 
-    lower_byte = string.byte(data, 5)
-    upper_byte = string.byte(data, 6)
+    -- lower_byte = string.byte(data, 5)
+    -- upper_byte = string.byte(data, 6)
 
-    -- shift upper byte over and add lower byte
-    upper_byte = bit.lshift(upper_byte, 8)
-    out[3] = bit.bor(upper_byte, lower_byte)
+    -- -- shift upper byte over and add lower byte
+    -- upper_byte = bit.lshift(upper_byte, 8)
+    -- out[3] = bit.bor(upper_byte, lower_byte)
 
-    -- convert unsigned to signed
-    if (out[3] > 2^15) then
-        out[3] = out[3] - 2^16
-    end
+    -- -- convert unsigned to signed
+    -- if (out[3] > 2^15) then
+        -- out[3] = out[3] - 2^16
+    -- end
 
-    lower_byte = string.byte(data, 7)
-    upper_byte = string.byte(data, 8)
+    -- lower_byte = string.byte(data, 7)
+    -- upper_byte = string.byte(data, 8)
 
-    -- shift upper byte over and add lower byte
-    upper_byte = bit.lshift(upper_byte, 8)
-    out[4] = bit.bor(upper_byte, lower_byte)
+    -- -- shift upper byte over and add lower byte
+    -- upper_byte = bit.lshift(upper_byte, 8)
+    -- out[4] = bit.bor(upper_byte, lower_byte)
 
-    -- convert unsigned to signed
-    if (out[4] > 2^15) then
-        out[4] = out[4] - 2^16
-    end
+    -- -- convert unsigned to signed
+    -- if (out[4] > 2^15) then
+        -- out[4] = out[4] - 2^16
+    -- end
 
-    lower_byte = string.byte(data, 9)
-    upper_byte = string.byte(data, 10)
+    -- lower_byte = string.byte(data, 9)
+    -- upper_byte = string.byte(data, 10)
 
-    -- shift upper byte over and add lower byte
-    upper_byte = bit.lshift(upper_byte, 8)
-    out[5] = bit.bor(upper_byte, lower_byte)
+    -- -- shift upper byte over and add lower byte
+    -- upper_byte = bit.lshift(upper_byte, 8)
+    -- out[5] = bit.bor(upper_byte, lower_byte)
 
-    -- convert unsigned to signed
-    if (out[5] > 2^15) then
-        out[5] = out[5] - 2^16
-    end
+    -- -- convert unsigned to signed
+    -- if (out[5] > 2^15) then
+        -- out[5] = out[5] - 2^16
+    -- end
 
-    lower_byte = string.byte(data, 11)
-    upper_byte = string.byte(data, 12)
+    -- lower_byte = string.byte(data, 11)
+    -- upper_byte = string.byte(data, 12)
 
-    -- shift upper byte over and add lower byte
-    upper_byte = bit.lshift(upper_byte, 8)
-    out[6] = bit.bor(upper_byte, lower_byte)
+    -- -- shift upper byte over and add lower byte
+    -- upper_byte = bit.lshift(upper_byte, 8)
+    -- out[6] = bit.bor(upper_byte, lower_byte)
 
-    -- convert unsigned to signed
-    if (out[6] > 2^15) then
-        out[6] = out[6] - 2^16
-    end
+    -- -- convert unsigned to signed
+    -- if (out[6] > 2^15) then
+        -- out[6] = out[6] - 2^16
+    -- end
     
-    return out
+    -- return out
 end 
 
 -- user defined function: read single byte from reg_addr content of dev_addr
@@ -302,9 +304,11 @@ function record_to_file(nsamp, file_name)
             tmr.wdclr()
             count = count + 1
             -- encode data into one line JSON format
-            line = cjson.encode({temp1, temp2, temp3, temp4})
+            --line = cjson.encode({temp1, temp2, temp3, temp4})
             --print(line)
-
+            --print(temp1)
+            line = encoder.toHex(temp1) ..",".. encoder.toHex(temp2) ..",".. encoder.toHex(temp3) ..",".. encoder.toHex(temp4)
+            --print(line)
             -- write line to file
             file.writeline(line)
         end
