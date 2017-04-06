@@ -9,7 +9,7 @@ i2c.setup(id, sda, scl, i2c.SLOW)
 function write_to_mux(val)
     i2c.start(id)
     -- setup the write for device
-    i2c.address(id, 0xE0, i2c.TRANSMITTER)
+    i2c.address(id, 0x70, i2c.TRANSMITTER)
     -- write onto bus what register to be written
     i2c.write(id, val)
     -- write the value onto bus for specified register
@@ -18,7 +18,7 @@ end
 
 function read_mux_config()
     i2c.start(id)
-    i2c.address(id, 0xE1, i2c.TRANSMITTER)
+    i2c.address(id, 0x71, i2c.TRANSMITTER)
     c = i2c.read(id, 1)
     i2c.stop(id)
     return c
@@ -59,6 +59,7 @@ function read_imu_data(dev_addr)
     i2c.address(id, dev_addr, i2c.RECEIVER)
     data = i2c.read(id, 12)
     i2c.stop(id)
+    --print(data)
     
     lower_byte = string.byte(data, 1)
     upper_byte = string.byte(data, 2)
@@ -282,26 +283,34 @@ function record_to_file(nsamp, file_name)
         local line = ""
         local linecount = 1
         while count < nsamp do
-            local temp = {}
+            -- get imu data from ch 1
             write_to_mux(0x01)
             temp1 = read_imu_data(0x6B)
             temp2 = read_imu_data(0x6B)
+
+            -- get imu data from ch 2
             write_to_mux(0x02)
             temp3 = read_imu_data(0x6B)
             temp4 = read_imu_data(0x6B)
+            
             tmr.wdclr()
             count = count + 1
-            line = cjson.encode(temp1)
-            print(temp1)
-            print(line)
-            -- line = "" .. temp1[1] .. "," .. temp1[2] .. "," .. temp1[3] .. "," .. temp1[4] .. "," .. temp1[5] .. "," .. temp1[6] .. ","
-                      -- .. temp2[1] .. "," .. temp2[2] .. "," .. temp2[3] .. "," .. temp2[4] .. "," .. temp2[5] .. "," .. temp2[6] .. ","
-                      -- .. temp3[1] .. "," .. temp3[2] .. "," .. temp3[3] .. "," .. temp3[4] .. "," .. temp3[5] .. "," .. temp3[6] .. ","
-                      -- .. temp4[1] .. "," .. temp4[2] .. "," .. temp4[3] .. "," .. temp4[4] .. "," .. temp4[5] .. "," .. temp4[6] .. ""
+            -- encode data into one line JSON format
+            line = cjson.encode({temp1, temp2, temp3, temp4})
+            --print(line)
+
+            -- write line to file
             file.writeline(line)
         end
     end
     file.close()
+end
+
+function read_file(file_name)
+    if file.open(file_name) then
+        print(file.read())
+        file.close()
+    end
 end
 
 -- potential implementation of a calibration to set initial orientation with variable sensitivity for testing
