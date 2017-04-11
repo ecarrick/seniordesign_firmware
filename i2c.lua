@@ -18,42 +18,6 @@ function write_to_mux(val)
     i2c.stop(id)
 end
 
-function read_mux_config()
-    i2c.start(id)
-    i2c.address(id, 0x70, i2c.TRANSMITTER)
-    i2c.write(id, 0x71)
-    i2c.stop(id)
-    i2c.start(id)
-    i2c.address(id, 0x70, i2c.RECEIVER)
-    c = i2c.read(id, 1)
-    i2c.stop(id)
-    return c
-end
-
-function read_x_accel()
-    return _read_imu_value(0x6B, reg.OUT_X_L_XL, reg.OUT_X_H_XL)
-end
-
-function read_x_gyro()
-    return _read_imu_value(0x6B, reg.OUT_X_L_G, reg.OUT_X_H_G)
-end
-
-function read_y_accel()
-    return _read_imu_value(0x6B, reg.OUT_Y_L_XL, reg.OUT_Y_H_XL)
-end
-
-function read_y_gyro()
-    return _read_imu_value(0x6B, reg.OUT_Y_L_G, reg.OUT_Y_H_G)
-end
-
-function read_z_accel()
-    return _read_imu_value(0x6B, reg.OUT_Z_L_XL, reg.OUT_Z_H_XL)
-end
-
-function read_z_gyro()
-    return _read_imu_value(0x6B, reg.OUT_Z_L_G, reg.OUT_Z_H_G)
-end
-
 function read_imu_data(dev_addr)
     local data
    -- local out = {0, 0,  0, 0, 0, 0}
@@ -67,81 +31,7 @@ function read_imu_data(dev_addr)
     i2c.stop(id)
     
     return data
-    --print(data)
-    
-    -- lower_byte = string.byte(data, 1)
-    -- upper_byte = string.byte(data, 2)
 
-    -- -- shift upper byte over and add lower byte
-    -- upper_byte = bit.lshift(upper_byte, 8)
-    -- out[1] = bit.bor(upper_byte, lower_byte)
-
-    -- -- convert unsigned to signed
-    -- if (out[1] > 2^15) then
-        -- out[1] = out[1] - 2^16
-    -- end
-
-    -- lower_byte = string.byte(data, 3)
-    -- upper_byte = string.byte(data, 4)
-
-    -- -- shift upper byte over and add lower byte
-    -- upper_byte = bit.lshift(upper_byte, 8)
-    -- out[2] = bit.bor(upper_byte, lower_byte)
-
-    -- -- convert unsigned to signed
-    -- if (out[2] > 2^15) then
-        -- out[2] = out[2] - 2^16
-    -- end
-
-    -- lower_byte = string.byte(data, 5)
-    -- upper_byte = string.byte(data, 6)
-
-    -- -- shift upper byte over and add lower byte
-    -- upper_byte = bit.lshift(upper_byte, 8)
-    -- out[3] = bit.bor(upper_byte, lower_byte)
-
-    -- -- convert unsigned to signed
-    -- if (out[3] > 2^15) then
-        -- out[3] = out[3] - 2^16
-    -- end
-
-    -- lower_byte = string.byte(data, 7)
-    -- upper_byte = string.byte(data, 8)
-
-    -- -- shift upper byte over and add lower byte
-    -- upper_byte = bit.lshift(upper_byte, 8)
-    -- out[4] = bit.bor(upper_byte, lower_byte)
-
-    -- -- convert unsigned to signed
-    -- if (out[4] > 2^15) then
-        -- out[4] = out[4] - 2^16
-    -- end
-
-    -- lower_byte = string.byte(data, 9)
-    -- upper_byte = string.byte(data, 10)
-
-    -- -- shift upper byte over and add lower byte
-    -- upper_byte = bit.lshift(upper_byte, 8)
-    -- out[5] = bit.bor(upper_byte, lower_byte)
-
-    -- -- convert unsigned to signed
-    -- if (out[5] > 2^15) then
-        -- out[5] = out[5] - 2^16
-    -- end
-
-    -- lower_byte = string.byte(data, 11)
-    -- upper_byte = string.byte(data, 12)
-
-    -- -- shift upper byte over and add lower byte
-    -- upper_byte = bit.lshift(upper_byte, 8)
-    -- out[6] = bit.bor(upper_byte, lower_byte)
-
-    -- -- convert unsigned to signed
-    -- if (out[6] > 2^15) then
-        -- out[6] = out[6] - 2^16
-    -- end
-    
-    -- return out
 end 
 
 -- user defined function: read single byte from reg_addr content of dev_addr
@@ -211,49 +101,6 @@ function init_gyro()
     
 end
 
--- generic function to read either a gyro or accelerometer value from registers
-function _read_imu_value(iic_address,lo_register, hi_register)
-
-    lower_byte = string.byte(read_reg_byte(iic_address, lo_register))
-    upper_byte = string.byte(read_reg_byte(iic_address, hi_register))
-
-    -- shift upper byte over and add lower byte
-    upper_byte = bit.lshift(upper_byte, 8)
-    imu_value = bit.bor(upper_byte, lower_byte)
-
-    -- convert unsigned to signed
-    if (imu_value > 2^15) then
-        imu_value = imu_value - 2^16
-    end
-
-    return imu_value
-    
-end
-
-function read_x_accel()
-    return _read_imu_value(0x6B, reg.OUT_X_L_XL, reg.OUT_X_H_XL)
-end
-
-function read_x_gyro()
-    return _read_imu_value(0x6B, reg.OUT_X_L_G, reg.OUT_X_H_G)
-end
-
-function read_y_accel()
-    return _read_imu_value(0x6B, reg.OUT_Y_L_XL, reg.OUT_Y_H_XL)
-end
-
-function read_y_gyro()
-    return _read_imu_value(0x6B, reg.OUT_Y_L_G, reg.OUT_Y_H_G)
-end
-
-function read_z_accel()
-    return _read_imu_value(0x6B, reg.OUT_Z_L_XL, reg.OUT_Z_H_XL)
-end
-
-function read_z_gyro()
-    return _read_imu_value(0x6B, reg.OUT_Z_L_G, reg.OUT_Z_H_G)
-end
-
 -- read acc/gyro data through a low pass filter
 -- gain is a positive integer that weighs previous calculation more heavily than raw data
 function collect_filter(gain, prev)
@@ -307,20 +154,13 @@ function record_to_file(nsamp, file_name)
             --line = cjson.encode({temp1, temp2, temp3, temp4})
             --print(line)
             --print(temp1)
-            line = encoder.toHex(temp1) ..",".. encoder.toHex(temp2) ..",".. encoder.toHex(temp3) ..",".. encoder.toHex(temp4)
+            line = "[\"" ..encoder.toHex(temp1) .."\",\"".. encoder.toHex(temp2) .."\",\"".. encoder.toHex(temp3) .."\",\"".. encoder.toHex(temp4) .. "\"," .. tmr.now() .. "]"
             --print(line)
             -- write line to file
             file.writeline(line)
         end
     end
     file.close()
-end
-
-function read_file(file_name)
-    if file.open(file_name) then
-        print(file.read())
-        file.close()
-    end
 end
 
 -- potential implementation of a calibration to set initial orientation with variable sensitivity for testing

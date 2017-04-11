@@ -9,14 +9,14 @@ function firebase_put(data)
 
 
     -- set this to where you want to store each shot
-    json_name = "testdata"
+    json_name = "newData"
     
-    firebase_str = "https://shotanalytics-17fc3.firebaseio.com/" .. json_name .. "/shot" .. shot_num .. "/sample" .. sample_num .. ".json"
+    firebase_str = "https://shotanalytics-17fc3.firebaseio.com/" .. json_name .. "/shot" .. shot_num .. ".json"
     print(firebase_str)
     print(data)
     http.post(firebase_str,
                 nil,
-                cjson.encode(data),
+                data,
                 function(code,data)           
                 if (code < 0) then
                   print("HTTP request failed")
@@ -54,6 +54,7 @@ function start_and_record_to_file()
     file_name = "test.txt"
     -- first parameter is number of values to record
     record_to_file(100, file_name)
+    print(node.heap())
     file.open(file_name)
     firebase_put_count = 1
     still_sending = true
@@ -74,20 +75,13 @@ function send_line()
         print("done!")
         return
     else
-        value_count = 1
-        value_table = {}
-        for val in string.gmatch(line, "-?%d+") do
-            value_table[value_count] = val
-            value_count = value_count + 1
-            --print(val)
-        end
-        firebase_put(value_table)
+        firebase_put(line)
     end
 end
 
 function setup()
     wifi.setmode(wifi.STATION)
-    wifi.sta.config(station_cfg)
+    print(wifi.sta.config(station_cfg))
     while (wifi.sta.status() ~= 5 )
     do
         print(wifi.sta.status())
