@@ -178,13 +178,13 @@ function record_to_file(nsamp, file_name)
         while count < nsamp do
             -- get imu data from ch 1
             write_to_mux(0x01)
-            temp1 = read_imu_data(0x6B)
+            temp1 = read_imu_data(0x6A)
             temp2 = read_imu_data(0x6B)
 
             -- get imu data from ch 2
             write_to_mux(0x02)
             temp3 = read_imu_data(0x6B)
-            temp4 = read_imu_data(0x6B)
+            temp4 = read_imu_data(0x6A)
             
             tmr.wdclr()
             count = count + 1
@@ -213,10 +213,14 @@ sample_num = 0
 still_sending = false
 
 -- session ID saved to "record.txt" and incremented on reset
-file.open("record.txt")
-session = file.readline()
-session = session + 1
-file.close("record.txt")
+
+if file.open("record.txt") then
+    session = file.readline()
+    session = session + 1
+    file.close("record.txt")
+else
+    session = 1
+end
 file.open("record.txt", "w")
 file.writeline(session)
 file.close()
@@ -283,13 +287,19 @@ function send_line()
 end
 
 function setup()
-    wifi.setmode(wifi.STATION)
-    print(wifi.sta.config(station_cfg))
-    while (wifi.sta.status() ~= 5 )
-    do
-        print(wifi.sta.status())
-        tmr.delay(1000000)
+    print("setting up wifi")
+    local status = wifi.sta.status()
+    print(status)
+    if status ~= 5 then
+        wifi.setmode(wifi.STATION)
+        print(wifi.sta.config(station_cfg))
+        while (wifi.sta.status() ~= 5 )
+        do
+            print(wifi.sta.status())
+            tmr.delay(1000000)
+        end
     end
+
     print(wifi.sta.getip())
 end
 
@@ -350,9 +360,9 @@ function startup()
 end
 
 -- insert Network details (works better with MAC address)
-station_cfg.ssid = ""
-station_cfg.pwd = ""
-station_cfg.bssid = "AA:BB:CC:DD:EE:FF"
+--station_cfg.ssid = ""
+--station_cfg.pwd = ""
+--station_cfg.bssid = "AA:BB:CC:DD:EE:FF"
 gpio.write(3, gpio.LOW)
 gpio.trig(5, "down", connect)
 
