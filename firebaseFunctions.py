@@ -51,30 +51,21 @@ def genFullSet():
     return [generateData(), generateData(), generateData()]
 
 #takes in x,y,z list values
-def integral(arr):
-    a= np.array(arr[0])
-    b= np.array(arr[1])
-    c=np.array(arr[2])
-    r = range(0,len(arr[0]))
+def timeIntegral(arr):
+    a= arr
+    r = range(0,len(arr))
     na = []
-    nb = []
-    nc = []
-    for x in range(1,len(arr[0])):
+    for x in range(0,len(arr)):
         print(len(a[:x]), len(r[:x]), x)
         apr = scipy.integrate.simps(a[:x], r[:x])
-        bpr = scipy.integrate.simps(b[:x], r[:x])
-        cpr = scipy.integrate.simps(c[:x], r[:x])
-        #print(x,apr,bpr,cpr)
-        na.append((apr, x))
-        nb.append((bpr, x))
-        nc.append((cpr, x))
-    return [na, nb, nc]
+        na.append(apr)
+    return na
 
-def integral2(arr):
+def integral2(arr, r):
     a= np.array(arr[0])
     b= np.array(arr[1])
     c=np.array(arr[2])
-    r = range(0,len(arr[0]))
+    #r = range(0,len(arr[0]))
     na = []
     nb = []
     nc = []
@@ -136,10 +127,27 @@ def dataSplice(fName):
         a.append(x.split(' '))
     return a[9:453]
         
+#Takes in the individual shot array, not the array of all shots
 def formatDataSet(a):
-    magx = []
-    magy = []
-    magz = []
+    accelx = []
+    accely = []
+    accelz = []
+    gyrox = []
+    gyroy= []
+    gyroz = []
+    for x in range(2,len(a)):
+        key = sorted(list(a.keys()))[x]
+        accelx.append(float(a['sample'+str(x)][key][0]))
+        accely.append(float(a['sample'+str(x)][key][1]))
+        accelz.append(float(a['sample'+str(x)][key][2]))
+        gyrox.append(float(a['sample'+str(x)][key][3]))
+        gyroy.append(float(a['sample'+str(x)][key][4]))
+        gyroz.append(float(a['sample'+str(x)][key][5]))
+    accel = [accelx, accely, accelz]
+    gyro = [gyrox, gyroy, gyroz]
+    return [accel, gyro]
+  
+def formatDataSet2(a, sensor):
     accelx = []
     accely = []
     accelz = []
@@ -147,22 +155,41 @@ def formatDataSet(a):
     gyroy= []
     gyroz = []
     for x in range(0,len(a)):
-        magx.append(float(a[x][1]))
-        magy.append(float(a[x][2]))
-        magz.append(float(a[x][3]))
-        accelx.append(float(a[x][4]))
-        accely.append(float(a[x][5]))
-        accelz.append(float(a[x][6]))
-        gyrox.append(float(a[x][7]))
-        gyroy.append(float(a[x][8]))
-        gyroz.append(float(a[x][9]))
-    mag = [magx, magy, magz]
+        key = sorted(list(a.keys()))[x]
+        fromHex = dataFromHex(a[key][sensor])
+        accelx.append(float(fromHex[3])*.000244)
+        accely.append(float(fromHex[4])*.000244)
+        accelz.append(float(fromHex[5])*.000244)
+        gyrox.append(float(fromHex[0])*.0175)
+        gyroy.append(float(fromHex[1])*.0175)
+        gyroz.append(float(fromHex[2])*.0175)
     accel = [accelx, accely, accelz]
     gyro = [gyrox, gyroy, gyroz]
-    return [accel, gyro, mag]
-    
+    return [accel, gyro]    
 
-    
+def getTimeArr(a):
+    time = []
+    offsetKey = sorted(list(a.keys()))[0]
+    offset = int(a[offsetKey][4])
+    for x in range(0,len(a)):
+        key = sorted(list(a.keys()))[x]
+        newTime = int(a[key][4]) - offset
+        secTime = newTime*pow(10,-6)
+        time.append(secTime)
+    return time
+
+def dataFromHex(a):
+    #imu_string = "530030001700520017ff780f"
+    imu_string = a
+    imu_reading = {}
+    for i in range(0, 24, 4):
+        lower_byte = int(imu_string[i:i+2], 16) # get first two hex values and convert to base 10
+        upper_byte = int(imu_string[i+2:i+4], 16) # get next two hex values and convert to base 10
+        value = (upper_byte << 8) + lower_byte # shift left 8 and add lower byte
+        if (value > pow(2, 15)): 
+            value = value - pow(2, 16) # unsigned to signed conversion
+        imu_reading[i/4] = value # store in list
+    return imu_reading    
 
 
 
