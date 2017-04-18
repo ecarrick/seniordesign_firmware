@@ -4,7 +4,7 @@ function startup()
         return
     end
     print('in startup')
-    dofile('user.lua')
+    dofile('simple.lua')
 end
 
 print("safety timeout 2s to stop autorun")

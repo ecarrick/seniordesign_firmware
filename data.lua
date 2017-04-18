@@ -1,4 +1,4 @@
-dofile("i2c.lua")
+--dofile("i2c.lua")
 dofile("wifi.lua")
 
 shot_num = 0

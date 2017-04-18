@@ -66,6 +66,8 @@ function init_accel()
     -- set Zen_XL, Yen_XL, Xen_XL bits to 1 enable each accelerometer
     register_write_value = bit.bor(register_write_value, bit.lshift(0x7, 3))
     write_reg_byte(0x6B, reg.CTRL_REG5_XL, register_write_value)
+    write_reg_byte(0x6A, reg.CTRL_REG5_XL, register_write_value)
+
 
     -- set ctrl_reg6_xl
     register_write_value = 0
@@ -74,10 +76,12 @@ function init_accel()
     -- set FS_XL bits to 11 to set accel scale to (+/-) 8g
     register_write_value = bit.bor(register_write_value, bit.lshift(0x3, 3))
     write_reg_byte(0x6B, reg.CTRL_REG6_XL, register_write_value)
+    write_reg_byte(0x6A, reg.CTRL_REG6_XL, register_write_value)
     
     -- set ctrl_reg7_xl
     register_write_value = 0
     write_reg_byte(0x6B, reg.CTRL_REG7_XL, register_write_value)
+    write_reg_byte(0x6A, reg.CTRL_REG7_XL, register_write_value)
     
 end
 
@@ -90,46 +94,20 @@ function init_gyro()
     -- set FS_G bits to 01 to set gyro scale to (+/-) 500 dps
     register_write_value = bit.bor(register_write_value, bit.lshift(0x1, 3))
     write_reg_byte(0x6B, reg.CTRL_REG1_G, register_write_value)
+    write_reg_byte(0x6A, reg.CTRL_REG1_G, register_write_value)
  
     -- set ctrl_reg2_g
     register_write_value = 0
     write_reg_byte(0x6B, reg.CTRL_REG2_G, register_write_value)
+    write_reg_byte(0x6A, reg.CTRL_REG2_G, register_write_value)
 
     -- set ctrl_reg3_g
     register_write_value = 0
     write_reg_byte(0x6B, reg.CTRL_REG3_G, register_write_value)
+    write_reg_byte(0x6A, reg.CTRL_REG3_G, register_write_value)
     
 end
 
--- read acc/gyro data through a low pass filter
--- gain is a positive integer that weighs previous calculation more heavily than raw data
-function collect_filter(gain, prev)
-    local y = {}
-    y[1] = (read_x_accel() + gain * prev[1])/(gain + 1)
-    y[2] = (read_y_accel() + gain * prev[2])/(gain + 1)
-    y[3] = (read_z_accel() + gain * prev[3])/(gain + 1)
-    y[4] = (read_x_gyro() + gain * prev[4])/(gain + 1)
-    y[5] = (read_y_gyro() + gain * prev[5])/(gain + 1)
-    y[6] = (read_z_gyro() + gain * prev[6])/(gain + 1)
-    return y
-end
-
-
--- 10000 samples should operate for ~10.5 seconds before timing out (*need pushbutton interrupt*)
--- we'll have to see if the truncation becomes a problem 
-function record(calib_val, nsamp)
-    gain = 3
-    count = 1
-    local y = {[1] = calib_val}
-    while count < nsamp do
-        y[count + 1] = collect_filter(gain, y[count])
-        print(node.heap())
-        tmr.wdclr()
-        tmr.delay(1050)
-        count = count + 1
-    end
-    return y
-end
 
 function record_to_file(nsamp, file_name)
     count = 1
@@ -184,9 +162,10 @@ function calibrate(sensitivity)
     end
     return y[5]
 end    
-    
+
+write_to_mux(0x01)
 init_accel()
 init_gyro()
--- calib = calibrate(300)
--- IMU = record(calib, 100)
--- print(IMU[50][1],IMU[50][3])
+write_to_mux(0x02)
+init_accel()
+init_gyro()
