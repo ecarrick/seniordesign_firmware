@@ -1,31 +1,31 @@
 import numpy as np
 import math
 
-Reye = [[1,0,0],[0,1,0],[0,0,1]]
-dzero = [[0],[0],[0]]
+Reye = np.array([[1,0,0],[0,1,0],[0,0,1]])
+dzero = np.array([[0],[0],[0]])
 
 def SE3(d, R):
-    g = [[R, d] , [0,0,0,1]]
+    g = np.array([[R, d] , [0,0,0,1]])
     return g
     
 def getPos(g):
-    p = [g[:3, 3]]
+    p = np.array([g[:3, 3]])
     return p
     
 def getRot(g):
-    R = [g[:3, :3]]
+    R = np.array([g[:3, :3]])
     return R
     
 def Rx(ang):
-    R = [[1,0,0],[0, math.cos(ang), -math.sin(ang)],[0, math.sin(ang), math.cos(ang)]]
+    R = np.array([[1,0,0],[0, math.cos(ang), -math.sin(ang)],[0, math.sin(ang), math.cos(ang)]])
     return R
 
 def Ry(ang):
-    R = [[math.cos(ang), 0, math.sin(ang)],[0,1,0],[-math.sin(ang), 0, math.cos(ang)]]
+    R = np.array([[math.cos(ang), 0, math.sin(ang)],[0,1,0],[-math.sin(ang), 0, math.cos(ang)]])
     return R
 
 def Rz(ang):
-    R = [[math.cos(ang), -math.sin(ang), 0],[math.sin(ang), math.cos(ang), 0],[0,0,1]]
+    R = np.array([[math.cos(ang), -math.sin(ang), 0],[math.sin(ang), math.cos(ang), 0],[0,0,1]])
     return R
     
 def Rmat(xang, yang, zang):
@@ -33,7 +33,7 @@ def Rmat(xang, yang, zang):
     return R
     
 def gravFix(gCurr):
-    grav = [[0],[0],[-1]]
+    grav = np.array([[0],[0],[-1]])
     ggrav = SE3(grav, Reye)
     R = getRot(gCurr)
     gR = SE3(dzero, R)
@@ -52,7 +52,7 @@ def update(g, accel, gyro, vel, theta, tstep):
     thetanew = theta + thetastep
     return [gnew, vnew, thetanew]
     
-def filter(accel, gyro):
+def filt(accel, gyro):
     ax[0] = accel[0,0]
     ay[0] = accel[1,0]
     az[0] = accel[2,0]
@@ -71,7 +71,27 @@ def filter(accel, gyro):
     gout = [gx, gy, gz]
     return [aout, gout]
     
-def process(
+def process(accel, gyro, time)
+	start = 0
+	[ac, gy] = filt(accel, gyro)
+	for x in range(0, len(a[0])
+		if start == 0 
+			bool1 = ac[0,x] > -.1 && ac[0,x] < .1
+			bool2 = ac[1,x] > -.1 && ac[1,x] < .1
+			bool3 = ac[2,x] > -1.1 && ac[2,x] < -.9
+			if bool1 && bool2 && bool3
+				start = 1
+				i = 0
+				g[0] = SE3(dzero, Reye)
+				v[0] = np.array([[0],[0],[0]])
+				theta[0] = np.array([[0],[0],[0]])
+				pos[0] = getPos(g[0])
+		else
+			i = i + 1
+			[g[i], v[i], theta[i]] = update(gcurr, ac[:3, x], gy[:3, x], v, theta, time[x])
+			pos[i] = getPos(g[i])
+	return [g, pos, v, theta]
+	
     
     
     
