@@ -2,18 +2,21 @@ import numpy as np
 import math
 
 Reye = np.array([[1,0,0],[0,1,0],[0,0,1]])
-dzero = np.array([[0],[0],[0]])
+dzero = [0,0,0]
 
 def SE3(d, R):
-    g = np.array([[R, d] , [0,0,0,1]])
+    l1 = [R[0,0], R[0,1], R[0,2], d[0]]
+    l2 = [R[1,0], R[1,1], R[1,2], d[1]]
+    l3 = [R[2,0], R[2,1], R[2,2], d[2]]
+    g = np.array([l1, l2, l3, [0,0,0,1]])
     return g
     
 def getPos(g):
-    p = np.array([g[:3, 3]])
+    p = [g[0,3],g[1,3],g[2,3]]
     return p
     
 def getRot(g):
-    R = np.array([g[:3, :3]])
+    R = np.array(g[:3, :3])
     return R
     
 def Rx(ang):
@@ -29,70 +32,74 @@ def Rz(ang):
     return R
     
 def Rmat(xang, yang, zang):
-    R = Rx(xang).dot(Ry.yang).dot(Rz.zang)
+    R = Rx(xang).dot(Ry(yang)).dot(Rz(zang))
     return R
     
 def gravFix(gCurr):
-    grav = np.array([[0],[0],[-1]])
+    grav = [0,0,.95]
     ggrav = SE3(grav, Reye)
     R = getRot(gCurr)
     gR = SE3(dzero, R)
-    newggrav = ggrav.dot(gR)
-    newgrav = getpos(newggrav)
+    newggrav = gR.dot(ggrav)
+    newgrav = getPos(newggrav)
     return newgrav
     
 def update(g, accel, gyro, vel, theta, tstep):
     a = gravFix(g)
-    accel = accel-a
+    accel = 9.8*(accel-a)
     d = tstep*(vel + .5*accel*tstep)
     thetastep = gyro*tstep
-    gupdate = SE3(d, Rmat(thetastep[0],thetastep[1],thetastep[2]))
+    gupdate = SE3(d, Rmat(math.radians(thetastep[0]),math.radians(thetastep[1]),math.radians(thetastep[2])))
     gnew = g.dot(gupdate)
     vnew = vel + accel*tstep
-    thetanew = theta + thetastep
+    thetanew = [theta[0] + thetastep[0],theta[1] + thetastep[1],theta[2] + thetastep[2]]
     return [gnew, vnew, thetanew]
     
 def filt(accel, gyro):
-    ax[0] = accel[0,0]
-    ay[0] = accel[1,0]
-    az[0] = accel[2,0]
-    gx[0] = gyro[0,0]
-    gy[0] = gyro[1,0]
-    gz[0] = gyro[2,0]
+    ax = [accel[0,0]]
+    ay = [accel[1,0]]
+    az = [accel[2,0]]
+    gx = [gyro[0,0]]
+    gy = [gyro[1,0]]
+    gz = [gyro[2,0]]
     
-    for x in range(1,len(accel[0]))
-        ax[x] = .75 * ax[x-1] + .25 * accel[0,x]
-        ay[x] = .75 * ay[x-1] + .25 * accel[1,x]
-        az[x] = .75 * az[x-1] + .25 * accel[2,x]
-        gx[x] = .75 * gx[x-1] + .25 * gyro[0,x]
-        gy[x] = .75 * gy[x-1] + .25 * gyro[1,x]
-        gz[x] = .75 * gz[x-1] + .25 * gyro[2,x]
-    aout = [ax, ay, az]
-    gout = [gx, gy, gz]
+    for x in range(1,len(accel[0])):
+        ax.append(.7 * ax[x-1] + .3 * accel[0,x])
+        ay.append(.7 * ay[x-1] + .3 * accel[1,x])
+        az.append(.7 * az[x-1] + .3 * accel[2,x])
+        gx.append(.7 * gx[x-1] + .3 * gyro[0,x])
+        gy.append(.7 * gy[x-1] + .3 * gyro[1,x])
+        gz.append(.7 * gz[x-1] + .3 * gyro[2,x])
+    aout = np.array([ax, ay, az])
+    gout = np.array([gx, gy, gz])
     return [aout, gout]
     
-def process(accel, gyro, time)
-	start = 0
-	[ac, gy] = filt(accel, gyro)
-	for x in range(0, len(a[0])
-		if start == 0 
-			bool1 = ac[0,x] > -.1 && ac[0,x] < .1
-			bool2 = ac[1,x] > -.1 && ac[1,x] < .1
-			bool3 = ac[2,x] > -1.1 && ac[2,x] < -.9
-			if bool1 && bool2 && bool3
-				start = 1
-				i = 0
-				g[0] = SE3(dzero, Reye)
-				v[0] = np.array([[0],[0],[0]])
-				theta[0] = np.array([[0],[0],[0]])
-				pos[0] = getPos(g[0])
-		else
-			i = i + 1
-			[g[i], v[i], theta[i]] = update(gcurr, ac[:3, x], gy[:3, x], v, theta, time[x])
-			pos[i] = getPos(g[i])
-	return [g, pos, v, theta]
-	
-    
+def process(accel, gyro, time):
+    start = 0
+    [ac, gy] = filt(accel, gyro)
+    g = SE3(dzero, Reye)
+    pos = [getPos(g)]
+    v = np.array([0,0,0])
+    theta = [[0,0,0]]
+    for x in range(0, len(ac[0])):
+        i = 0
+        if start == 0:
+            bool1 = (ac[0,x] > -.1 and ac[0,x] < .1)
+            bool2 = (ac[1,x] > -.1 and ac[1,x] < .1)
+            bool3 = (ac[2,x] > -1.1 and ac[2,x] < -.9)
+            if x==1 or (bool1 and bool2 and bool3):
+                start = 1
+        else:
+            t = time[x]-time[x-1]
+            temp = update(g, ac[:3, x], gy[:3, x], v, theta[i], t)
+            g = temp[0]
+            v = temp[1]
+            theta.append(temp[2])
+            pos.append(getPos(g))            
+            i = i + 1
+    return [pos, theta]
+
+
     
     
     
