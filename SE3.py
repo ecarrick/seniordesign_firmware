@@ -58,28 +58,30 @@ def update(g, accel, gyro, vel, theta, tstep, gbias):
     thetanew = [theta[0]+thetastep[0],theta[1]+thetastep[1],theta[2]+thetastep[2]]
     return [gnew, vnew, thetanew]
     
-def filt(accel, gyro):
+def filt(accel, gyro, gain):
     ax = [accel[0,0]]
     ay = [accel[1,0]]
     az = [accel[2,0]]
     gx = [gyro[0,0]]
     gy = [gyro[1,0]]
     gz = [gyro[2,0]]
-    
+    a = gain
+    b = (1-gain)
     for x in range(1,len(accel[0])):
-        ax.append(.95 * ax[x-1] + .05 * accel[0,x])
-        ay.append(.95 * ay[x-1] + .05 * accel[1,x])
-        az.append(.95 * az[x-1] + .05 * accel[2,x])
-        gx.append(.95 * gx[x-1] + .05 * gyro[0,x])
-        gy.append(.95 * gy[x-1] + .05 * gyro[1,x])
-        gz.append(.95 * gz[x-1] + .05 * gyro[2,x])
+        ax.append(a * ax[x-1] + b * accel[0,x])
+        ay.append(a * ay[x-1] + b * accel[1,x])
+        az.append(a * az[x-1] + b * accel[2,x])
+        gx.append(a * gx[x-1] + b * gyro[0,x])
+        gy.append(a * gy[x-1] + b * gyro[1,x])
+        gz.append(a * gz[x-1] + b * gyro[2,x])
     aout = np.array([ax, ay, az])
     gout = np.array([gx, gy, gz])
     return [aout, gout]
     
 def process(accel, gyro, time, d):
     start = 0
-    [ac, gy] = filt(accel, gyro)
+    [ac, gy] = filt(accel, gyro,.9)
+ #   [ac, gy] = [accel, gyro]
     g = SE3(d, Reye)
     pos = [getPos(g)]
     v = np.array([0,0,0])
@@ -117,26 +119,32 @@ def process(accel, gyro, time, d):
 def run(num, sensor, l):
     a = aa.dataHandle()
     b = aa.fbtf.formatDataSet2(a[0]['shot'+num],sensor)
-    d = filt(b[0],b[1])
+    d = filt(b[0],b[1],.9)
     t = aa.fbtf.getTimeArr(a[0]['shot'+num])
     c = process(b[0],b[1],t,[0,l,0])
-    return [b[0],d[0],d[1],t,c]
+    return [b,d[0],d[1],t,c]
 
 def plot(result):
     plt.figure(1)
+    plt.plot(result[0][0][0])
+    plt.plot(result[0][0][1])
+    plt.plot(result[0][0][2])
     plt.plot(result[1][0])
     plt.plot(result[1][1])
     plt.plot(result[1][2])
     plt.legend(['x','y','z'])
     plt.title('Filtered Acceleration')
     plt.figure(2)
+    plt.plot(result[0][1][0])
+    plt.plot(result[0][1][1])
+    plt.plot(result[0][1][2])
     plt.plot(result[2][0])
     plt.plot(result[2][1])
     plt.plot(result[2][2])
     plt.legend(['x','y','z'])
     plt.title('Filtered Gyroscope')
     plt.figure(3)
-    plt.plot(result[4][0])
+    plt.plot(result[4][0][0:35])
     plt.legend(['x','y','z'])
     plt.title('Position')
     plt.figure(4)
@@ -145,12 +153,15 @@ def plot(result):
     plt.title('Angle')
     plt.figure(5)
 #    plt.plot(result[4][2][0], result[4][2][2])
-    plt.plot(result[1][1], result[1][2])
+    plt.plot(result[1][0], result[1][2])
     plt.title('X vs Z')
     plt.figure(6)
 #    plt.plot(result[4][2][1],result[4][2][2])
-    plt.plot(result[2][1], result[2][2])
+    plt.plot(result[1][1], result[1][2])
     plt.title('Y vs Z')
+    plt.figure(7)
+    plt.plot(result[3])
+    plt.title('Time')
     return result[4]
 
 def metrics():
