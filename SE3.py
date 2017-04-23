@@ -180,7 +180,7 @@ def metrics():
         xv.append(result[i][4][3][0])
         yv.append(result[i][4][3][1])
         zv.append(result[i][4][3][2])
-        xmax.append([np.amax(xa[i]),np.amax(xv[i]),np.amax(xg[i])])
+        xmax.append([np.argmax(xa[i]),np.amax(xv[i]),np.amax(xg[i])])
         ymax.append([np.amax(ya[i]),np.amax(yv[i]),np.amax(yg[i])])
         zmax.append([np.amax(za[i]),np.amax(zv[i]),np.amax(zg[i])])
         xmin.append([np.amin(xa[i]),np.amin(xv[i]),np.amin(xg[i])])
