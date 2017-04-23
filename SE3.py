@@ -88,12 +88,13 @@ def process(accel, gyro, time, d):
     xa = []
     ya = []
     za = []
+    vel = []
     for x in range(0, len(ac[0])):
         if start == 0:
             bool1 = (ac[0,x] > -.1 and ac[0,x] < .1)
             bool2 = (ac[1,x] > -.1 and ac[1,x] < .1)
             bool3 = (ac[2,x] < 1.1 and ac[2,x] > .9)
-            if x==1 or (bool1 and bool2 and bool3):
+            if x == 1 or (bool1 and bool2 and bool3):
                 start = 1
                 gbias = [gy[0,x],gy[1,x],gy[2,x]]
                 g = SE3(d,Rmat(math.atan2(ac[1,x],ac[2,x]),math.atan2(ac[0,x],math.sqrt(ac[2,x]*ac[2,x]+ac[1,x]*ac[1,x])),0))
@@ -107,10 +108,11 @@ def process(accel, gyro, time, d):
             v = temp[1]
             theta.append(temp[2])
             pos.append(getPos(g))
+            vel.append([v[0],v[1],v[2]])
             xa.append(getPos(g)[0])
             ya.append(getPos(g)[1])
             za.append(getPos(g)[2])
-    return [pos, theta, [xa,ya,za]]
+    return [pos, theta, [xa,ya,za], vel]
 
 def run(num, sensor, l):
     a = aa.dataHandle()
@@ -142,14 +144,52 @@ def plot(result):
     plt.legend(['x','y','z'])
     plt.title('Angle')
     plt.figure(5)
-    plt.plot(result[4][2][0], result[4][2][2])
+#    plt.plot(result[4][2][0], result[4][2][2])
+    plt.plot(result[1][1], result[1][2])
     plt.title('X vs Z')
     plt.figure(6)
-    plt.plot(result[4][2][1],result[4][2][2])
+#    plt.plot(result[4][2][1],result[4][2][2])
+    plt.plot(result[2][1], result[2][2])
     plt.title('Y vs Z')
     return result[4]
 
-
+def metrics():
+    result = [run('0',0,0),run('0',1,0),run('0',2,0),run('0',3,0)]
+    xa = []
+    ya = []
+    za = []
+    xg = []
+    yg = []
+    zg = []
+    xv = []
+    yv = []
+    zv = []
+    xmax = []
+    xmin = []
+    ymax = []
+    ymin = []
+    zmax = []
+    zmin = []
+    for i in range(0,4):
+        xa.append(result[i][1][0])
+        ya.append(result[i][1][1])
+        za.append(result[i][1][2])
+        xg.append(result[i][2][0])
+        yg.append(result[i][2][1])
+        zg.append(result[i][2][2])
+        xv.append(result[i][4][3][0])
+        yv.append(result[i][4][3][1])
+        zv.append(result[i][4][3][2])
+        xmax.append([np.amax(xa[i]),np.amax(xv[i]),np.amax(xg[i])])
+        ymax.append([np.amax(ya[i]),np.amax(yv[i]),np.amax(yg[i])])
+        zmax.append([np.amax(za[i]),np.amax(zv[i]),np.amax(zg[i])])
+        xmin.append([np.amin(xa[i]),np.amin(xv[i]),np.amin(xg[i])])
+        ymin.append([np.amin(ya[i]),np.amin(yv[i]),np.amin(yg[i])])
+        zmin.append([np.amin(za[i]),np.amin(zv[i]),np.amin(zg[i])])
+    return [xmax, xmin, ymax, ymin, zmax, zmin]
+        
+    
+    
     
 
     
