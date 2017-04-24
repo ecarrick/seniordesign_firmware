@@ -1,7 +1,6 @@
 import numpy as np
 import math
 import matplotlib.pyplot as plt
-import AnalyticsApplication as aa
 
 Reye = np.array([[1,0,0],[0,1,0],[0,0,1]])
 dzero = [0,0,0]
@@ -116,13 +115,18 @@ def process(accel, gyro, time, d):
             za.append(getPos(g)[2])
     return [pos, theta, [xa,ya,za], vel]
 
-def run(num, sensor, l):
-    a = aa.dataHandle()
-    b = aa.fbtf.formatDataSet2(a[0]['shot'+num],sensor)
+def run(b, t):
     d = filt(b[0],b[1],.9)
-    t = aa.fbtf.getTimeArr(a[0]['shot'+num])
-    c = process(b[0],b[1],t,[0,l,0])
-    return [b,d[0],d[1],t,c]
+    c = process(b[0],b[1],t,[0,0,0])
+    return [d[0],d[1],t,c]
+
+#def run2(num, sensor, l):
+#    a = aa.dataHandle()
+#    b = aa.fbtf.formatDataSet2(a[0]['shot'+num],sensor)
+#    d = filt(b[0],b[1],.9)
+#    t = aa.fbtf.getTimeArr(a[0]['shot'+num])
+#    c = process(b[0],b[1],t,[0,l,0])
+#    return [b,d[0],d[1],t,c]
 
 def plot(result):
     plt.figure(1)
@@ -165,7 +169,7 @@ def plot(result):
     return result[4]
 
 def metrics():
-    result = [run('0',0,0),run('0',1,0),run('0',2,0),run('0',3,0)]
+    result = [run2('0',0,0),run2('0',1,0),run2('0',2,0),run2('0',3,0)]
     xa = []
     ya = []
     za = []
@@ -191,14 +195,37 @@ def metrics():
         xv.append(result[i][4][3][0])
         yv.append(result[i][4][3][1])
         zv.append(result[i][4][3][2])
-        xmax.append([np.argmax(xa[i]),np.amax(xv[i]),np.amax(xg[i])])
+        xmax.append([np.amax(xa[i]),np.amax(xv[i]),np.amax(xg[i])])
         ymax.append([np.amax(ya[i]),np.amax(yv[i]),np.amax(yg[i])])
         zmax.append([np.amax(za[i]),np.amax(zv[i]),np.amax(zg[i])])
         xmin.append([np.amin(xa[i]),np.amin(xv[i]),np.amin(xg[i])])
         ymin.append([np.amin(ya[i]),np.amin(yv[i]),np.amin(yg[i])])
         zmin.append([np.amin(za[i]),np.amin(zv[i]),np.amin(zg[i])])
     return [xmax, xmin, ymax, ymin, zmax, zmin]
-        
+
+def metrics2(result, time, pos):
+     xa = result[0][0]
+     ya = result[0][1]
+     za = result[0][2]
+     xg = result[1][0]
+     yg = result[1][1]
+     zg = result[1][2]
+     xv = pos[0]
+     yv = pos[1]
+     zv = pos[2]
+     xmax = [np.amax(xa),np.amax(xv),np.amax(xg)]
+     ymax = [np.amax(ya),np.amax(yv),np.amax(yg)]
+     zmax = [np.amax(za),np.amax(zv),np.amax(zg)]
+     xmin = [np.amin(xa),np.amin(xv),np.amin(xg)]
+     ymin = [np.amin(ya),np.amin(yv),np.amin(yg)]
+     zmin = [np.amin(za),np.amin(zv),np.amin(zg)]
+     t = [time[np.argmax(xa)],time[np.argmax(xv)],time[np.argmax(xg)],
+               time[np.argmax(ya)],time[np.argmax(yv)],time[np.argmax(yg)],
+                time[np.argmax(za)],time[np.argmax(zv)],time[np.argmax(zg)],
+                time[np.argmin(xa)],time[np.argmin(xv)],time[np.argmin(xg)],
+                time[np.argmin(ya)],time[np.argmin(yv)],time[np.argmin(yg)],
+                time[np.argmin(za)],time[np.argmin(zv)],time[np.argmin(zg)]]
+     return [xmax, xmin, ymax, ymin, zmax, zmin, t]
     
     
     

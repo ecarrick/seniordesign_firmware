@@ -192,4 +192,3 @@ def dataFromHex(a):
     return imu_reading    
 
 
-
