@@ -10,7 +10,7 @@ import json
 from random import randint
 import numpy as np
 import scipy
-from plotly.graph_objs import Scatter, Layout
+#from plotly.graph_objs import Scatter, Layout
 
 def establish_connection(link):
     fb = firebase.FirebaseApplication(link, None)
@@ -163,8 +163,8 @@ def formatDataSet2(a, sensor):
         gyrox.append(float(fromHex[0])*.0175)
         gyroy.append(float(fromHex[1])*.0175)
         gyroz.append(float(fromHex[2])*.0175)
-    accel = [accelx, accely, accelz]
-    gyro = [gyrox, gyroy, gyroz]
+    accel = np.array([accelx, accely, accelz])
+    gyro = np.array([gyrox, gyroy, gyroz])
     return [accel, gyro]    
 
 def getTimeArr(a):
@@ -190,6 +190,5 @@ def dataFromHex(a):
             value = value - pow(2, 16) # unsigned to signed conversion
         imu_reading[i/4] = value # store in list
     return imu_reading    
-
 
 
