@@ -152,8 +152,8 @@ function init_gyro()
     local register_write_value = 0
     -- set ODR_G bitsto 110 to set output data rate to 952 Hz
     register_write_value = bit.lshift(bit.band(6, 0x07), 5)
-    -- set FS_G bits to 01 to set gyro scale to (+/-) 500 dps
-    register_write_value = bit.bor(register_write_value, bit.lshift(0x1, 3))
+    -- set FS_G bits to 01 to set gyro scale to (+/-) 2000 dps
+    register_write_value = bit.bor(register_write_value, bit.lshift(0x3, 3))
     write_reg_byte(0x6B, reg.CTRL_REG1_G, register_write_value)
     write_reg_byte(0x6A, reg.CTRL_REG1_G, register_write_value)
  
@@ -193,9 +193,9 @@ function record_to_file(nsamp, file_name)
             --print(line)
             --print(temp1)
             line = "[\"" ..encoder.toHex(temp1) .."\",\"".. encoder.toHex(temp2) .."\",\"".. encoder.toHex(temp3) .."\",\"".. encoder.toHex(temp4) .. "\"," .. tmr.now() .. "]"
-            --print(line)
+            print(line)
             -- write line to file
-            file.writeline(line)
+            --file.writeline(line)
         end
     end
     file.close()
@@ -208,7 +208,6 @@ write_to_mux(0x02)
 init_accel()
 init_gyro()
 
-shot_num = 0
 sample_num = 0
 still_sending = false
 
@@ -228,9 +227,9 @@ file.close()
 function firebase_put(data)
 
     -- set this to where you want to store each shot
-    json_name = "DataSession" .. session
+    json_name = "DataSession"
     
-    firebase_str = "https://shotanalytics-17fc3.firebaseio.com/" .. json_name .. "/shot" .. shot_num .. ".json"
+    firebase_str = "https://shotanalytics-17fc3.firebaseio.com/" .. json_name .. "/shot" .. session .. ".json"
     print(firebase_str)
     print(data)
     http.post(firebase_str,
@@ -256,7 +255,7 @@ function start_and_record_to_file()
     sample_num = 1
     file_name = "test.txt"
     -- first parameter is number of values to record
-    record_to_file(100, file_name)
+    record_to_file(50, file_name)
     gpio.write(3, gpio.LOW)
     print(node.heap())
     file.open(file_name)
@@ -267,7 +266,10 @@ end
 
 function finish_recording()
     file.close()
-    shot_num = shot_num + 1
+    session = session + 1
+    file.open("record.txt", "w")
+    file.writeline(session)
+    file.close()
     flash = true
     recording = false
     startup()
