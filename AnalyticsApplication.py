@@ -8,14 +8,8 @@ Created on Tue Mar 28 15:05:47 2017
 
 import pygame
 import firebaseFunctions as fbtf
-<<<<<<< HEAD
-from Tkinter import *
-import tkFileDialog as fd
-=======
-from tkinter import *
 import tkinter.filedialog as fd
 import SE3
->>>>>>> f9df1f6d944a7b4f32a4dc1d5fc5c14b2891f8b5
 filename= 'FastPickup.txt'
 global screen
 global clock
